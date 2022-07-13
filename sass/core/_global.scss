@@ -1,0 +1,21 @@
+html, body {
+  height: 100%;
+}
+body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  background-color: $background-color;
+  background-image: url(../images/background.jpg);
+  color: $text-black;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
+  overflow-x: hidden;
+}
+a {
+  @include link-colors($link-color, $link-color-hover);
+  @include hover-link;
+}
+hr {
+  border-top: 1px solid #cfcfcf;
+}

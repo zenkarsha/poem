@@ -1,0 +1,8 @@
+<?php
+
+function convertBase64($path)
+{
+  $type = pathinfo($path, PATHINFO_EXTENSION);
+  $base64 = file_get_contents($path);
+  return $base64;
+}

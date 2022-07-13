@@ -1,0 +1,11 @@
+<?php
+
+$config['navbar'] = [
+
+  [
+    'name' => 'Author github',
+    'icon' => 'fa fa-plus-square',
+    'url' => 'https://github.com/zenkarsha'
+  ]
+
+];

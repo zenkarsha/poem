@@ -1,0 +1,15 @@
+.mobile-hide {
+  display: none;
+  @include at-breakpoint($pad) {
+    display: initial;
+  }
+}
+.desktop-hide {
+  display: initial;
+  @include at-breakpoint($desktop) {
+    display: none;
+  }
+}
+.process {
+  @include opacity(0.2);
+}

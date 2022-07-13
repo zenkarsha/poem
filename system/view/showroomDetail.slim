@@ -1,0 +1,34 @@
+---
+$path
+$url
+$image
+$itemname
+$likebtn
+$likecount
+---
+
+#showroom-detail.row
+  .col-sm-12
+    .well
+      img.img-responsive src="{{$image}}"
+    div.like
+      | {{$likebtn}}&nbsp;&nbsp;·&nbsp;&nbsp;
+      i.fa.fa-thumbs-o-up &nbsp;{{$likecount}} 個人說好詩
+    hr
+    .row
+      .col-md-12.share-link.text-center
+        | 直接分享本頁
+        span.mobile-hide ：
+        br.desktop-hide
+        a href="{{$path}}{{$url}}" {{$path}}{{$url}}
+      .col-md-4.text-center
+        .fb-like data-href="{{$path}}{{$url}}" data-layout="button_count" data-action="like" data-show-faces="true" data-share="true"
+      .col-md-4.text-center
+        a href="{{$path}}showroom?sort=hot"
+          i.fa.fa-book &nbsp;
+          | 更多{{$itemname}}
+      .col-md-4.text-center
+        a href="{{$path}}"
+          i.fa.fa-pencil &nbsp;
+          | 發表{{$itemname}}
+    hr

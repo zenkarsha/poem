@@ -1,0 +1,161 @@
+<?php
+
+function autoWrap($text,$flag)
+{
+  $flag = $flag*3;
+  $j=0;
+  $text = str_replace("\r","",$text);
+  $new_text = explode("\n", $text);
+  $data = array();
+  for($i=0;$i<count($new_text);$i++)
+  {
+    $count=strlen($new_text[$i]);
+    if($count>$flag)
+    {
+      $tempData=utf8_str_split($new_text[$i]);
+      $tempPlus=0;
+      $tempSplit=array();
+      for($k=0;$k<count($tempData);$k++)
+      {
+        $tempPlus=$tempPlus+strlen($tempData[$k]);
+        if($tempPlus==$flag)
+        {
+          array_push($tempSplit,($k));
+          $tempPlus=0;
+        }
+        elseif($tempPlus>$flag)
+        {
+          array_push($tempSplit,($k-1));
+          $tempPlus=strlen($tempData[$k]);
+        }
+      }
+      array_push($tempSplit,count($tempData));
+      $start=0;
+      $tempString=null;
+      foreach ($tempSplit as $value) {
+        for($m=$start;$m<=$value;$m++)
+        {
+          @$tempString=$tempString.$tempData[$m];
+        }
+        if($tempString!=='') $data[$j++]=$tempString;
+        $start=$value+1;
+        $tempString=null;
+      }
+    }
+    else
+    {
+      $data[$j++]=$new_text[$i];
+    }
+  }
+  for($i=0;$i<count($data);$i++)
+  {
+    @$new_data = $new_data.$data[$i].'
+';
+  }
+  return $new_data;
+}
+function outputFilename($text)
+{
+  $text = str_replace("\r","",$text);
+  $new_text = explode("\n", $text);
+  $filename = $new_text[0];
+  $filename = str_replace('.','',$filename);
+  $filename = str_replace(',','',$filename);
+  return $filename;
+}
+function firstLineHeight($text,$fontsize,$font)
+{
+  $text=str_replace("\r","",$text);
+  $new_text=explode("\n", $text);
+  $text_dimensions = imagettfbbox($fontsize, 0, $font, $new_text[0]);
+  $text_height = abs($text_dimensions[5] - $text_dimensions[1]);
+  return $text_height;
+}
+function utf8_str_split($str, $split_len = 1)
+{
+  if (!preg_match('/^[0-9]+$/', $split_len) || $split_len < 1) return FALSE;
+  $len = mb_strlen($str, 'UTF-8');
+  if ($len <= $split_len) return array($str);
+  preg_match_all('/.{'.$split_len.'}|[^\x00]{1,'.$split_len.'}$/us', $str, $ar);
+  return $ar[0];
+}
+function closest($array, $number) {
+  sort($array);
+  foreach ($array as $key => $a) {
+    if ($a >= $number) return $key;
+  }
+  return key(array_slice($array,-1,1,TRUE));
+}
+function utf8_substr($StrInput,$strStart,$strLen)
+{
+  $StrInput = mb_substr($StrInput,$strStart,mb_strlen($StrInput));
+  $iString = urlencode($StrInput);
+  $lstrResult="";
+  $istrLen = 0;
+  $k = 0;
+  do
+  {
+    $lstrChar = substr($iString, $k, 1);
+    if($lstrChar == "%")
+    {
+      $ThisChr = hexdec(substr($iString, $k+1, 2));
+      if($ThisChr >= 128)
+      {
+        if($istrLen+3 < $strLen)
+        {
+          $lstrResult .= urldecode(substr($iString, $k, 9));
+          $k = $k + 9;
+          $istrLen+=3;
+        }
+        else
+        {
+          $k = $k + 9;
+          $istrLen+=3;
+        }
+      }
+      else
+      {
+        $lstrResult .= urldecode(substr($iString, $k, 3));
+        $k = $k + 3;
+        $istrLen+=2;
+      }
+    }
+    else
+    {
+      $lstrResult .= urldecode(substr($iString, $k, 1));
+      $k = $k + 1;
+      $istrLen++;
+    }
+  }
+  while($k < strlen($iString) && $istrLen < $strLen);
+    return $lstrResult;
+}
+function limitLine($text,$max)
+{
+  $text_array = explode("\n", $text);
+  array_splice($text_array, $max);
+  count($text_array);
+  foreach ($text_array as $value) {
+    @$newtext .= $value.'
+';
+  }
+  return $newtext;
+}
+function findReplace($keyword,$text)
+{
+  @$pos = strpos($text,$keyword);
+  if($pos !== false) return 1;
+  else return 0;
+}
+function replaceByArray($text,$array)
+{
+  foreach($array as $to => $from)
+  {
+    foreach($from as $word)
+    {
+      if(findReplace($word,$text))
+      $text = str_replace($word,$to,$text);
+    }
+  }
+  return $text;
+}

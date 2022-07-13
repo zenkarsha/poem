@@ -1,0 +1,65 @@
+<?php
+
+class install extends model
+{
+  function __construct($db)
+  {
+    foreach(glob('./system/config/*') as $filename) include $filename;
+    $this->config = $config;
+    $this->db = $db;
+    $this->console('Install start:');
+
+    // create database
+    $sql = 'CREATE DATABASE IF NOT EXISTS '.DBNAME;
+    if(!mysql_query($sql,$this->db))
+      $this->console('DB create failed: "' . mysql_error().'"', 0);
+    else
+      $this->console('DB created.');
+
+    // create sub feature table
+    if($this->config['init']['enable-showroom'])
+    {
+      $this->handleSQL('showroom');
+      $this->console('Please create folder "'.$this->config['showroom']['imgfolder'].'" manually, and set permission to 755');
+    }
+
+    $this->console('Install finished, please refresh your page.');
+    exit;
+  }
+  private function handleSQL($component)
+  {
+    $sql = file_get_contents('./system/sql/'.$component.'.sql');
+    $sql = str_replace('DBNAME',DBNAME,$sql);
+    $querys = explode(';',$sql);
+
+    foreach ($querys as $query)
+    {
+      if(trim($query) !== '')
+      {
+        $this->console('Query: "'.$query.'"');
+        if(!mysql_query($query))
+          $this->console('Invalid query: "' . mysql_error().'"', 0);
+        else
+          $this->console('Done.');
+      }
+    }
+  }
+  private function createFolder($dir,$mode = 644)
+  {
+    if(mkdir($dir,'0'.$mode))
+      $this->console('Folder "'.$dir.'" create failed.');
+    else
+      $this->console('Folder "'.$dir.'" create failed.', 0);
+  }
+  private function console($msg,$mode=1)
+  {
+    switch ($mode) {
+      case 0:
+        echo '<span style="color:red"># '.$msg.'</span><br>';
+        exit;
+
+      default:
+        echo '<span># '.$msg.'</span><br>';
+    }
+  }
+}

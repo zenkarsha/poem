@@ -1,0 +1,25 @@
+<?php
+
+function view($url,$replace=null,$root='./',$preconvert=true)
+{
+  $view = file_get_contents($root.'system/view/'.$url);
+  if($preconvert && getFileExt($url) == 'slim')
+    $view = slim2html($view);
+  if($replace!==null) {
+    foreach($replace as $key => $value)
+      $view = str_replace('{{'.$key.'}}', $value, $view);
+  }
+  $view = preg_replace("/---[\s\S]*---/", "", $view);
+  $view = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $view);
+  if(!$preconvert && getFileExt($url) == 'slim')
+    $view = slim2html($view);
+  return $view;
+}
+function partial($partial,$replace=null,$type='html',$preconvert=true)
+{
+  $url = 'partial/'.$partial.'.'.$type;
+  $content = view($url,$replace,'./',$preconvert);
+  if($type == 'js') $content = '<script>'.$content.'</script>';
+  elseif($type == 'css') $content = '<style>'.$content.'</style>';
+  return $content;
+}

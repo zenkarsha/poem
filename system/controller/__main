@@ -1,0 +1,45 @@
+<?php
+
+class index extends view
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    $col = 12;
+    if($this->config['init']['enable-showroom'])
+    {
+      $col = 6;
+      @$button .= partial('submitButton',[
+        '$col-size' => $col,
+        '$id' => 'showroom-submit',
+        '$btn-color' => $this->config['showroom']['button-color'],
+        '$name' => $this->config['showroom']['button-name'],
+        '$icon' => slimClass($this->config['showroom']['button-icon'])
+      ],'slim',false);
+    }
+    @$button .= partial('submitButton',[
+      '$col-size' => $col,
+      '$id' => 'default-submit',
+      '$btn-color' => $this->config['app']['button-color'],
+      '$name' => $this->config['app']['button-name'],
+      '$icon' => slimClass($this->config['app']['button-icon'])
+    ],'slim',false);
+
+    $positionbtn = partial('positionButton',null,'slim');
+
+    foreach ($this->config['facebook']['fanpage'] as $value)
+      @$fanpage .= partial('fanpageBox',['$url' => $value]);
+
+    $this->pageCreator([
+      '$content' => view('index.slim',[
+        '$path' => $this->config['site']['path'],
+        '$title' => $this->config['site']['title'],
+        '$description' => $this->config['site']['description'],
+        '$button' => $button,
+        '$fanpage' => $fanpage,
+        '$position-button' => $positionbtn
+      ])
+    ]);
+  }
+}

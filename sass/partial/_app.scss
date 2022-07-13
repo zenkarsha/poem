@@ -1,0 +1,47 @@
+#app {
+  h1 {
+    display: none;
+  }
+  h2 {
+    display: none;
+  }
+  .comment {
+    margin-top: 30px;
+    h3 {
+      height: 37px;
+      display: block;
+      font-size: 1px;
+      text-indent: -9999px;
+      margin: 10px auto;
+      background: url(../images/h3-comment.png) center no-repeat;
+      background-size: contain;
+    }
+  }
+  .btn {
+    font-weight: bold;
+  }
+  #poem {
+    height: 180px;
+  }
+  .egg {
+    display: none;
+  }
+
+  @include at-breakpoint($pad) {
+
+  }
+  @include at-breakpoint($pad-plus) {
+    h1 {
+      font-size:1px;
+      text-indent:-9999px;
+      height: 80px;
+      background: url(../images/h1.png) center no-repeat;
+      background-size: contain;
+      margin:20px auto;
+      display: block;
+    }
+  }
+  @include at-breakpoint($desktop) {
+
+  }
+}

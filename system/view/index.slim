@@ -1,0 +1,70 @@
+---
+$path
+$title
+$description
+$button
+$fanpage
+$position-button
+---
+
+form#appform.form-horizontal role="form" action="generate" method="post"
+  input#type type="hidden" value="" name="type"
+  #app.row
+    .col-md-8.preview
+      .preview-img
+        div
+      .loading
+        .spinner
+          .double-bounce1
+          .double-bounce2
+    .col-md-4.tools.process
+      h1 {{$title}}
+      h2 {{$description}}
+      .form-group
+        label 請輸入要藏的句子（最多12字）
+        .input-group
+          input#text.form-control name="text" type="text" placeholder="請輸入文字" maxlength="12" value="藏頭詩產生器"
+          span.input-group-btn
+            button#regen.btn.btn-default type="button" 產生詩文
+      .form-group
+        label 編輯詩文內容
+        textarea#poem.form-control name="poem"
+      .row
+        .col-sm-12.col-md-6
+          .form-group
+            label 每句長度
+            .btn-group data-toggle="buttons" style="width:100%"
+              label.btn.btn-success style="width:50%"
+                input type="radio" name="length" value="5" autocomplete="off" 五言
+              label.btn.btn-success.active style="width:50%"
+                input type="radio" name="length" value="7" autocomplete="off" checked="checked" 七言
+        .col-sm-12.col-md-6
+          .form-group
+            label 更多設定
+            .btn-group data-toggle="buttons" style="width:100%"
+              label.btn.btn-success.active style="width:50%"
+                input#vertical name="vertical" type="checkbox" value="1" autocomplete="off" checked="checked" 直書
+              label.btn.btn-success style="width:50%"
+                input#shadow name="shadow" type="checkbox" value="1" autocomplete="off" 陰影
+      .form-group
+        label 藏頭位置
+        .btn-group data-toggle="buttons" style="width:100%" {{$position-button}}
+      .row
+        .col-xs-6
+          .form-group
+            label for="bgcolor" 背景顏色
+            input#bgcolor.form-control.minicolors type="text" name="bgcolor" value="#FFFFFF" data-color-format="hex"
+        .col-xs-6
+          .form-group
+            label for="color" 文字顏色
+            input#color.form-control.minicolors type="text" name="color" value="#000000" data-color-format="hex"
+      .row.egg
+        .col-xs-6
+          label for="font" 字體
+          select#font.form-control name="font"
+            option selected="selected" value="0"  朕的字體
+        .col-xs-6
+          label for="fontsize" 字級
+          input#fontsize.form-control type="number" name="fontsize" value="50" min="1" max="100"
+      hr
+      .row {{$button}}

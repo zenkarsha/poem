@@ -1,0 +1,29 @@
+<?php
+
+function getDomain($url)
+{
+  $parse = parse_url($url);
+  return $parse['host'];
+}
+function currentUrl()
+{
+  if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $scheme = 'https';
+  else $scheme = 'http';
+  return $scheme.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+}
+function explodeUrl($path)
+{
+  $full = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+  $full = strtok($full,'?');
+  $array = explode("/",str_replace($path,'',$full));
+  for($i=0; $i<count($array); $i++)
+    if($array[$i]!=='') $url[$i+'1'] = $array[$i];
+  @$url = array_values($url);
+  if($url[0] == '' || $url[0] == null) $url[0] = 'index';
+  return $url;
+}
+function headerTo($url)
+{
+  header("Location: $url");
+}
+

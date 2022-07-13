@@ -1,0 +1,26 @@
+textarea,
+input[type=text] {
+  &.form-control {
+    @include border-radius(3px);
+    font-size: $base-font-size;
+    line-height: $base-line-height;
+    color: $text-black;
+    outline: none;
+    &:hover,&:active,&:focus {
+      outline: none;
+      border: 1px solid $main-color;
+      @include box-shadow(none);
+    }
+  }
+}
+
+textarea.form-control {
+  margin:auto auto;
+  width: 100%;
+  resize: none;
+}
+
+.form-horizontal .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}

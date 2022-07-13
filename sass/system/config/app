@@ -1,0 +1,14 @@
+<?php
+
+$config['app'] = [
+
+  'server'        => 2, // 1:混合 2:大陸 31/32:NTU+備用/NTU
+  'padding'       => 40,
+
+  'default-text'  => '藏頭詩產生器',
+  'filename'      => '藏頭詩',
+  'button-color'  => 'primary',
+  'button-name'   => '下載圖片',
+  'button-icon'   => 'fa fa-download'
+
+];

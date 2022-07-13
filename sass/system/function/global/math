@@ -1,0 +1,16 @@
+<?php
+
+function base62($num)
+{
+  $base='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $r = $num % 62 ;
+  $res = $base[$r];
+  $q = floor($num/62);
+  while ($q)
+  {
+    $r = $q % 62;
+    $q =floor($q/62);
+    $res = $base[$r].$res;
+  }
+  return $res;
+}

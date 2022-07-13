@@ -1,0 +1,17 @@
+<?php
+
+$config['init'] = [
+
+  // domain settings
+  'domain' => 'poem',
+
+  // database settings
+  'enable-database'       => false,
+  'enable-showroom'       => false,
+
+  // feature settings
+  'enable-searchbar'      => false,
+  'enable-member-system'  => false,
+  'enable-admin-system'   => false
+
+];

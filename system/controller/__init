@@ -1,0 +1,128 @@
+<?php
+
+class view
+{
+  function __construct()
+  {
+    $this->init();
+  }
+  private function init()
+  {
+    // 讀取設定項
+    foreach(glob('./system/config/*') as $filename) include $filename;
+    $this->config = $config;
+
+    // 讀取資料庫
+    if($this->config['init']['enable-database'] == true)
+    {
+      define('DBHOST',$this->config['database']['host']);
+      define('DBUSER',$this->config['database']['user']);
+      define('DBPASS',$this->config['database']['pass']);
+      define('DBNAME',$this->config['database']['db']);
+
+      include './system/core/model';
+      foreach(glob('./system/model/*') as $filename)
+      {
+        include $filename;
+        $filename = explode('/', preg_replace('/\\.[^.\\s]{3,4}$/', '', $filename));
+        $filename = end($filename);
+        $classname = $filename.'Model';
+        $this->model[$classname] = new $classname();
+      }
+    }
+  }
+  public function handle($function=null,$parameter=null)
+  {
+    $args = func_get_args();
+    array_shift($args);
+    return call_user_func_array([$this->getModel($function), $function], $args);
+  }
+  private function getModel($function=null)
+  {
+    foreach($this->model as $key => $value)
+    {
+      $methods = get_class_methods($key);
+      foreach ($methods as $name)
+      {
+        if($function == $name)
+        {
+          return $this->model[$key];
+          exit;
+        }
+      }
+    }
+  }
+  public function pageCreator($replace=[],$layout='default')
+  {
+    $replace['$head'] = view('_head.slim', [
+      '$path' => $this->config['site']['path'],
+      '$title' => $this->config['site']['title'],
+      '$shortcut-icon' => $this->config['site']['shortcut-icon']
+    ]);
+    $replace['$foot'] = view('_foot.slim', [
+      '$path' => $this->config['site']['path']
+    ]);
+    $replace['$google-analytics'] = partial('googleAnalytics', [
+      '$analytics-id' => $this->config['google']['analytics-id']
+    ]);
+    $replace['$facebook-api'] = partial('facebookApi', [
+      '$app-id' => $this->config['facebook']['app-id']
+    ]);
+
+    if(!isset($replace['$head-custom']))
+      $replace['$head-custom'] = null;
+    if(!isset($replace['$foot-custom']))
+      $replace['$foot-custom'] = null;
+    if(!isset($replace['$navbar']))
+    {
+      if($this->config['init']['enable-showroom'])
+      {
+        @$nav .= partial('navbarItem', [
+          '$name' => '產生器',
+          '$icon' => stringToClass('fa fa-code'),
+          '$url' => $this->config['site']['path']
+        ],'slim');
+        @$nav .= partial('navbarItem', [
+          '$name' => $this->config['showroom']['navbar-title'],
+          '$icon' => stringToClass($this->config['showroom']['icon']),
+          '$url' => $this->config['site']['path'].'showroom'
+        ],'slim');
+      }
+      foreach ($this->config['navbar'] as $value)
+        @$nav .= partial('navbarItem', [
+          '$name' => $value['name'],
+          '$icon' => stringToClass($value['icon']),
+          '$url' => $value['url']
+        ],'slim');
+      $replace['$navbar'] = view('_navbar.slim', [
+        '$path' => $this->config['site']['path'],
+        '$brand' => $this->config['site']['name'],
+        '$nav' => $nav
+      ]);
+    }
+    if(!isset($replace['$og']))
+      $replace['$og'] = view('_og.slim', [
+        '$title' => $this->config['og']['title'],
+        '$type' => $this->config['og']['type'],
+        '$url' => $this->config['og']['url'],
+        '$image' => $this->config['og']['image'],
+        '$sitename' => $this->config['og']['sitename'],
+        '$description' => $this->config['og']['description']
+      ]);
+    if(!isset($replace['$header']))
+      $replace['$header'] = view('_header.slim', null);
+    if(!isset($replace['$footer']))
+      $replace['$footer'] = view('_footer.slim', [
+        '$copyright' => $this->config['site']['copyright']
+      ]);
+    if(!isset($replace['$content']))
+      $replace['$content'] = 'Hello World!';
+
+    $page = file_get_contents('./system/view/layout/'.$layout.'.html');
+    foreach($replace as $key => $value) $page = str_replace('{{'.$key.'}}', $value, $page);
+    $page = preg_replace("/---[\s\S]*---/", "", $page);
+    $page = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $page);
+    echo minifyHtml($page).view('partten.html', null);
+  }
+
+}

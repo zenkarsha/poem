@@ -1,0 +1,19 @@
+---
+$path
+$brand
+$nav
+---
+
+.navbar.navbar-fixed-top
+  .container
+    .navbar-header
+      button.navbar-toggle type="button" data-toggle="collapse" data-target=".navbar-collapse"
+        span.sr-only Toggle
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+      a.navbar-brand.logo href="{{$path}}"
+        |{{$brand}}&nbsp;
+        fb:like href="{{$path}}" width="120" layout="button_count" show_faces="true" send="false"
+    nav.collapse.navbar-collapse role="navigation"
+    ul.nav.navbar-nav.navbar-right {{$nav}}

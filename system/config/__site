@@ -1,0 +1,14 @@
+<?php
+
+$config['site'] = [
+
+  'path' => 'http://'.$_SERVER['HTTP_HOST'].str_replace('index.php','',$_SERVER['PHP_SELF']),
+  'url' => 'https://'.$config['init']['domain'].'.unlink.men/',
+  'default' => 'detail',
+  'name'  => '藏頭詩產生器',
+  'title' => '藏頭詩產生器',
+  'description' => '白日藏名與時集，何人頭似雪一一，似我詩人自江湖，鑿破產因逢花稀，松下生雲山自古，非才器獨無風儀。',
+  'copyright' => 'just for fun',
+  'shortcut-icon' => 'https://'.$config['init']['domain'].'.unlink.men/images/favicon.png'
+
+];

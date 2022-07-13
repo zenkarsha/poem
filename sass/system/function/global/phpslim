@@ -1,0 +1,121 @@
+<?php
+
+function slim2html($input)
+{
+  $single = ['meta','link','br','hr','img','input','nav'];
+
+  $input = preg_replace("/---[\s\S]*---/", "", $input);
+  $input = str_replace("\\\n", '', $input);
+  $lines = explode("\n", str_replace("\r", '', $input));
+  for($i = 0; $i < count($lines); $i++)
+    if(ltrim($lines[$i]) == '' || substr(ltrim($lines[$i]),0,1) == '/')
+      unset($lines[$i]);
+  $lines = array_values(array_filter($lines));
+
+  $tab = []; $elem = []; $id = []; $class = []; $attr = []; $content = [];
+  for($i = 0; $i < count($lines); $i++)
+  {
+    $tab[$i] = strlen($lines[$i]) - strlen(ltrim($lines[$i]));
+    $object = explode(' ',ltrim($lines[$i]), 2);
+
+    if(substr($object[0],0,1) == '|')
+    {
+      $elem[$i] = '|';
+      $content[$i] = ltrim(substr(ltrim($lines[$i]),1));
+    }
+    elseif(substr($object[0],0,1) == '=')
+    {
+      $elem[$i] = '|';
+      $parameter = explode(' ',$object[1], 2);
+      $content[$i] = $parameter[0]($parameter[1]);
+    }
+    else
+    {
+      if(substr($object[0],0,1) == '.' || substr($object[0],0,1) == '#') $elem[$i] = 'div';
+      else
+      {
+        $output = explodeByArray(['.','#'], $object[0]);
+        $elem[$i] = $output[0];
+      }
+
+      $id[$i] = slimFindId($object[0]);
+      $class[$i] = slimFindClass($object[0]);
+      if(isset($object[1]))
+      {
+        preg_match_all('/([a-zA-Z0-9\-\_]*)=\\"([^\"]*)\\"/', $object[1], $output);
+        if(count($output[0]) > 0)
+        {
+          for($j=0; $j < count($output[0]); $j++)
+          {
+            if($output[1][$j] == 'id') $id[$i] = $output[2][$j];
+            if($output[1][$j] == 'class') $class[$i] = $output[2][$j];
+            @$attr[$i] .= $output[0][$j].' ';
+          }
+          $content[$i] = ltrim(str_replace($output[0],'',$object[1]));
+        }
+        else $content[$i] = $object[1];
+      }
+    }
+  }
+
+  $unclose = [];
+  for($i = 0; $i < count($lines); $i++)
+  {
+    if($i > 0 && $tab[$i] <= $tab[$i-1])
+    {
+      krsort($unclose);
+      foreach($unclose as $line)
+      {
+        if($tab[$line] >= $tab[$i]) {
+          $html .= '</'.$elem[$line].'>';
+          unset($unclose[$line]);
+          if(($key = array_search($line, $unclose)) !== false) unset($unclose[$key]);
+        }
+      }
+      ksort($unclose);
+      $unclose = array_values($unclose);
+    }
+    if($elem[$i] !== '|')
+    {
+      if(!in_array($elem[$i],$single)) array_push($unclose,$i);
+      @$html .= '<'.$elem[$i];
+      if(isset($id[$i])) $html .= ' id="'.$id[$i].'"';
+      if(isset($class[$i])) $html .= ' class="'.rtrim($class[$i]).'"';
+      if(isset($attr[$i])) $html .= ' '.rtrim($attr[$i]);
+      if(!in_array($elem[$i],$single)) $html .= '>'; else $html .= ' />';
+    }
+    if(isset($content[$i])) @$html .= $content[$i];
+  }
+  krsort($unclose);
+  foreach($unclose as $line) $html .= '</'.$elem[$line].'>';
+  return @$html;
+}
+function slimFindClass($input)
+{
+  preg_match_all("/\.[a-zA-Z0-9\-\_]*/", $input, $output);
+  if(count($output[0]) > 0)
+    foreach($output[0] as $class)
+      @$result .= substr($class,1).' ';
+  return @$result;
+}
+function slimFindId($input)
+{
+  preg_match_all("/#[a-zA-Z0-9\-\_]*/", $input, $output);
+  if(count($output[0]) > 0) return substr($output[0][0],1);
+  return null;
+}
+function javascript_include_tag($input)
+{
+  preg_match_all('/\\"([^\"]*)\\"/', $input, $output);
+  foreach ($output[1] as $value)
+    @$html .= '<script type="text/javascript" src="'.$value.'"></script>';
+  return @$html;
+}
+
+function stylesheet_link_tag($input)
+{
+  preg_match_all('/\\"([^\"]*)\\"/', $input, $output);
+  foreach ($output[1] as $value)
+    @$html .= '<link href="'.$value.'" media="screen" rel="stylesheet" type="text/css" />';
+  return @$html;
+}

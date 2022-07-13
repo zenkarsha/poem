@@ -1,0 +1,29 @@
+<?php
+
+class controller
+{
+  function controller()
+  {
+    $this->init();
+    $this->pageHandle();
+  }
+  private function init()
+  {
+    // load config
+    foreach(glob('./system/config/*') as $filename) include $filename;
+    $this->config = $config;
+
+    // load function
+    foreach(glob('./system/function/global/*') as $filename) include $filename;
+    foreach(array_filter(glob('./system/function/*'),'is_file') as $filename) include $filename;
+  }
+  private function pageHandle()
+  {
+    $this->url = explodeUrl($this->config['site']['path']);
+    foreach(glob('./system/controller/*') as $filename) include $filename;
+    if(class_exists($this->url[0]))
+      $this->view = new $this->url[0]($this->url);
+    else
+      $this->view = new $this->config['site']['default']($this->url);
+  }
+}

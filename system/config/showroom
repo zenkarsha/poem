@@ -1,0 +1,14 @@
+<?php
+
+$config['showroom'] = [
+
+  'imgfolder'     => 'i',
+  'navbar-title'  => '藏頭詩集',
+  'icon'          => 'fa fa-book',
+  'itemname'      => '藏頭詩',
+  'button-color'  => 'default',
+  'button-name'   => '投稿',
+  'button-icon'   => 'fa fa-paper-plane-o',
+  'perpage'       => 12
+
+];

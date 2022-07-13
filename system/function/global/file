@@ -1,0 +1,21 @@
+<?php
+
+function countFiles($folder,$ext)
+{
+  $files = glob($folder.'*.'.$ext);
+  if($files !== false)
+  {
+    $filecount = count($files);
+    return $filecount;
+  }
+  else return 0;
+}
+function includeAllFiles($folder,$filetype)
+{
+  foreach(glob($folder.'*.'.$filetype) as $filename)
+    include $filename;
+}
+function getFileExt($file)
+{
+  return substr(strrchr($file,'.'),1);
+}

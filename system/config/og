@@ -1,0 +1,12 @@
+<?php
+
+$config['og'] = [
+
+  'title' => $config['site']['title'],
+  'url' => $config['site']['url'],
+  'image' => $config['site']['url'].'images/fb-2.png',
+  'sitename'  => $config['site']['name'],
+  'description' => $config['site']['description'],
+  'type'  => 'website'
+
+];

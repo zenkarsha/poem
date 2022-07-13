@@ -1,0 +1,148 @@
+<?php
+
+class generate extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    $this->renew    = 0;
+    $this->poem     = $_POST['poem'];
+    $this->text     = $_POST['text'];
+    $this->length   = intval($_POST['length']);
+    $this->position = intval($_POST['position']);
+    $this->bgcolor  = hex2rgb($_POST['bgcolor']);
+    $this->color    = hex2rgb($_POST['color']);
+    $this->vertical = $_POST['vertical'];
+    $this->shadow   = $_POST['shadow'];
+    $this->type     = intval($_POST['type']);
+    $this->font     = intval($_POST['font']);
+    $this->fontsize     = intval($_POST['fontsize']);
+    if($this->vertical == 1) $this->vertical = 'true';
+    if($this->shadow == 1) $this->shadow = 'true';
+    $this->createImage($this->text);
+  }
+  private function createImage()
+  {
+    // setting
+    $font =  __DIR__ . '/../../font/jellyfish20140617.ttf';
+    $fontsize = $this->fontsize;
+    $padding = $this->config['app']['padding'];
+    if($this->font > 8) $offset = 1;
+    else $offset = 1.25;
+
+    // handle text
+    $this->text = preg_replace("/[^\x{4e00}-\x{9fa5}]+$/u", "", $this->text);
+    $this->text = preg_replace("/[\x{fe30}-\x{ffa0}]/u", "", $this->text);
+    if($this->text == null || $this->text == '') $this->text = $this->config['app']['default-text'];
+    $this->text = $this->linesToString();
+    if($this->vertical == 'true') $this->poem = $this->verticalText($this->poem);
+
+    // dimension
+    $dimension = textDimensions($this->poem,$font,$fontsize);
+    $width = $dimension[0] + 2*$padding;
+    $height = $dimension[1] + 2*$padding;
+
+    // create empty image
+    $this->image = imagecreatetruecolor($width, $height);
+
+    // color
+    $color = imagecolorallocate($this->image, $this->color[0], $this->color[1], $this->color[2]);
+    $shadow = imagecolorallocate($this->image, 100, 100, 100);
+    $background = imagecolorallocate($this->image, $this->bgcolor[0], $this->bgcolor[1], $this->bgcolor[2]);
+
+    // draw
+    imagefilledrectangle($this->image, 0, 0, $width, $height, $background);
+    if($this->shadow == 'true')
+      imagettftextbold($this->image, $fontsize, 0, $padding + 2, $padding + $fontsize*$offset + 1, $shadow, $font, $this->poem);
+    imagettftextbold($this->image, $fontsize, 0, $padding, $padding + $fontsize*$offset, $color, $font, $this->poem);
+
+    $this->handleImage();
+  }
+
+  private function linesToString()
+  {
+    $lines = explode("\n", $this->poem);
+    for($i=0;$i<count($lines);$i++) {
+      @$string .= trim($lines[$i]);
+      if($i !== count($lines) -1) $string .= '
+';
+    }
+    return $string;
+  }
+  private function stringForSave($text)
+  {
+    $lines = explode("\n", $text);
+    for($i=0;$i<count($lines);$i++) {
+      @$string .= trim($lines[$i]);
+      if($i !== count($lines) -1) $string .= ' / ';
+    }
+    return $string;
+  }
+  private function verticalText($text)
+  {
+    $lines = explode("\n", $text);
+    $l=0;
+    for($i = 0; $i < count($lines); $i++)
+    {
+      $new_lines[$l] = array();
+      $new_lines[$l] = utf8_str_split($lines[$i]);
+      for($j=0;$j<count($new_lines[$l]);$j++)
+        if(trim($new_lines[$l][$j]) == '') unset($new_lines[$l][$j]);
+      $l++; $new_lines[$l] = array();
+    }
+    unset($new_lines[$l]);
+    $string = '';
+    for($j = 0; $j < $this->length; $j++){
+      for($k = count($new_lines) - 1 ; $k >= 0; $k--) {
+        if(isset($new_lines[$k][$j])) $x = $new_lines[$k][$j];
+        else $x = '　';
+        if($k!==0) $string .= $x.' ';
+        else $string .= $x;
+      }
+      if($j !== $lineLength -1) $string .='
+';
+    }
+    return $string;
+  }
+  private function handleImage()
+  {
+    switch ($this->type)
+    {
+      // preview
+      case 1:
+        ob_start();
+        imagepng($this->image,null,9,null);
+        $this->image = ob_get_contents();
+        ob_end_clean();
+        @imagedestroy($this->image);
+        print json_encode(['preview'=>'<div><img src="data:image/png;base64,'.base64_encode($this->image).'" /></div>','renew'=>$this->renew,'poem'=>$this->text]);
+        break;
+
+      // showroom
+      case 2:
+        if($this->config['init']['enable-showroom'])
+        {
+          $url = base62(strrev(time())).randString(2);
+          $save = './'.$this->config['showroom']['imgfolder'].'/'.$url.'.png';
+          imagepng($this->image,$save,9,null);
+          $content = ['text' => $this->stringForSave($this->text)];
+          $content = json_encode($content);
+          $this->handle('insertShowroomItem',$url,addslashes($content),userIP(),userDevice(),time());
+          headerTo($url);
+          break;
+        }
+
+      //download
+      case 3:
+      default:
+        header('Content-Type: image/png');
+        header("Content-Transfer-Encoding: binary");
+        header('Content-Description: File Transfer');
+        header('Content-Disposition: attachment; filename='.$this->config['app']['filename'].'.png');
+        imagepng($this->image, null, 9, null);
+        @imagedestroy($this->image);
+        break;
+    }
+  }
+}

@@ -1,0 +1,189 @@
+<?php
+
+class showroom extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    if($this->config['init']['enable-showroom'])
+    {
+      @$total = $this->handle('count','showroom_detail');
+      if(@$_GET['sort'] == 'hot') $sort = 'view';
+      elseif(@$_GET['sort'] == 'good') $sort = 'like';
+      else $sort = 'id';
+      $data = $this->handle('getShowroomList','0,'.$this->config['showroom']['perpage'],$sort);
+
+      foreach ($data as $value)
+      {
+        if(!isset($_SESSION['like'.$value['id']]))
+          $likebtn = '<a class="likebtn" data-url="'.$value['url'].'">好詩</a>';
+        else
+          $likebtn = '<a class="unlikebtn" data-url="'.$value['url'].'">收回好詩</a>';
+
+        $content = json_decode($value['content'],true);
+        @$list.= partial('showroomItem',[
+          '$path' => $this->config['site']['path'],
+          '$url' => $value['url'],
+          '$image' => $this->config['site']['path'].$this->config['showroom']['imgfolder'].'/'.$value['url'].'.png',
+          '$likebtn' => $likebtn,
+          '$likecount' => '<span class="likecount" data-url="'.$value['url'].'">'.$value['like'].'</span>'
+        ],'slim');
+      }
+
+      $style = '';
+      if($total <= $this->config['showroom']['perpage'])
+        $style = partial('showroomHideLoadmore',null,'css');
+      $script = partial('showroom',[
+          '$path' => $this->config['site']['path']
+        ],'js');
+
+      $this->pageCreator([
+        '$content' => view('showroom.slim',[
+          '$path' => $this->config['site']['path'],
+          '$total' => $total,
+          '$list' => @$list,
+          '$sort' => @$_GET['sort'],
+          '$itemname' => $this->config['showroom']['itemname']
+        ]),
+        '$head-custom' => $style,
+        '$foot-custom' => $script
+      ]);
+    }
+    else headerTo($this->config['site']['path']);
+  }
+}
+class loadmore extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    if($this->config['init']['enable-showroom'] && isset($_POST['page']))
+    {
+      @$total = $this->handle('count','showroom_detail');
+      $page = ($_POST['page'] + 1) * $this->config['showroom']['perpage'];
+
+      if($total >= $page)
+      {
+        if(($page + $this->config['showroom']['perpage']) > $total)
+          $limit = $page.','.($total - $page + 1);
+        else
+          $limit = $page.','.$this->config['showroom']['perpage'];
+
+        if(@$_GET['sort'] == 'hot') $sort = 'view';
+        elseif(@$_GET['sort'] == 'good') $sort = 'like';
+        else $sort = 'id';
+        $data = $this->handle('getShowroomList',$limit,$sort);
+        foreach ($data as $value)
+        {
+          if(!isset($_SESSION['like'.$value['id']]))
+            $likebtn = '<a class="likebtn" data-url="'.$value['url'].'">好詩</a>';
+          else
+            $likebtn = '<a class="unlikebtn" data-url="'.$value['url'].'">收回好詩</a>';
+
+          $content = json_decode($value['content'],true);
+          @$list.= partial('showroomItem',[
+            '$path' => $this->config['site']['path'],
+            '$url' => $value['url'],
+            '$image' => $this->config['site']['path'].$this->config['showroom']['imgfolder'].'/'.$value['url'].'.png',
+            '$likebtn' => $likebtn,
+            '$likecount' => '<span class="likecount" data-url="'.$value['url'].'">'.$value['like'].'</span>'
+          ],'slim');
+        }
+        echo @$list;
+      }
+    }
+    else headerTo($this->config['site']['path']);
+  }
+}
+class detail extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    if($this->config['init']['enable-showroom'])
+    {
+      $data = $this->handle('getShowroomItem',$url[0]);
+      if($data['id'] == null)
+        headerTo($this->config['site']['path']);
+      else
+      {
+        //insert analytics
+        if(!isset($_SESSION['showroom'.$data['id']]))
+        {
+          $_SESSION['showroom'.$data['id']] = userIP();
+          $this->handle('updateShowroomItemView',$data['id']);
+        }
+        if(!isset($_SESSION['like'.$data['id']]))
+          $likebtn = '<a class="likebtn" data-url="'.$data['url'].'">好詩</a>';
+        else
+          $likebtn = '<a class="unlikebtn" data-url="'.$data['url'].'">收回好詩</a>';
+
+        $content = json_decode($data['content'],true);
+        $this->pageCreator([
+          '$content' => view('showroomDetail.slim',[
+            '$path' => $this->config['site']['path'],
+            '$url' => $data['url'],
+            '$image' => $this->config['site']['path'].$this->config['showroom']['imgfolder'].'/'.$data['url'].'.png',
+            '$itemname' => $this->config['showroom']['itemname'],
+            '$likebtn' => $likebtn,
+            '$likecount' => '<span class="likecount" data-url="'.$data['url'].'">'.$data['like'].'</span>'
+          ]),
+          '$og' => view('_og.slim',[
+            '$title' => $this->config['site']['name'],
+            '$type' => $this->config['og']['type'],
+            '$url' => $this->config['site']['path'].$data['url'],
+            '$image' => $this->config['site']['path'].$this->config['showroom']['imgfolder'].'/'.$data['url'].'.png',
+            '$sitename' => $this->config['og']['sitename'],
+            '$description' => $content['text']
+          ])
+        ]);
+      }
+    }
+    else headerTo($this->config['site']['path']);
+  }
+}
+class like extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    if(isset($_POST['url']))
+    {
+      $data = $this->handle('getShowroomItem',$_POST['url']);
+      if($data['id'] !== null && !isset($_SESSION['like'.$data['id']]))
+      {
+        $_SESSION['like'.$data['id']] = userIP();
+        $this->handle('updateShowroomItemLike',$data['id']);
+        $data = $this->handle('getShowroomItemLike',$data['id']);
+        print(json_encode(['state'=>true,'count'=>$data['like']]));
+      }
+      else print(json_encode(['state'=>false]));
+    }
+    else print(json_encode(['state'=>false]));
+  }
+}
+class unlike extends View
+{
+  function __construct($url)
+  {
+    parent::__construct();
+
+    if(isset($_POST['url']))
+    {
+      $data = $this->handle('getShowroomItem',$_POST['url']);
+      if($data['id'] !== null && isset($_SESSION['like'.$data['id']]) && $_SESSION['like'.$data['id']] == userIP())
+      {
+        unset($_SESSION['like'.$data['id']]);
+        $this->handle('updateShowroomItemUnlike',$data['id']);
+        $data = $this->handle('getShowroomItemLike',$data['id']);
+        print(json_encode(['state'=>true,'count'=>$data['like']]));
+      }
+      else print(json_encode(['state'=>false]));
+    }
+    else print(json_encode(['state'=>false]));
+  }
+}

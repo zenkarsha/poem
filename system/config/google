@@ -1,0 +1,7 @@
+<?php
+
+$config['google'] = [
+
+  'analytics-id'  => 'UA-00000000-00'
+
+];

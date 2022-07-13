@@ -1,0 +1,10 @@
+<?php
+
+$config['facebook'] = [
+
+  'fanpage' => ['',''],
+  'app-id' => '',
+  'app-secret' => '',
+  'privacy-policy' => ''
+
+];

@@ -1,0 +1,6 @@
+<?php
+
+function example()
+{
+  echo 'this is a example function';
+}

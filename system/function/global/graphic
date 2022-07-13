@@ -1,0 +1,20 @@
+<?php
+
+function imagettftextbold($image, $size, $angle, $x, $y, $color, $fontfile, $text, $bold = 1)
+{
+  for($i=0; $i<=$bold; $i++)
+    imagettftext($image, $size, $angle, $x + $i, $y, $color, $fontfile, $text);
+}
+function textDimensions($text,$font,$size)
+{
+  $dimensions = imagettfbbox($size, 0, $font, $text);
+  $width = abs($dimensions[4] - $dimensions[0]);
+  $height = abs($dimensions[5] - $dimensions[1]);
+  return [$width,$height];
+}
+function centerObjectPosition($canvasSize=[],$objectSize=[])
+{
+  $x = ($canvasSize[0] - $objectSize[0])*0.5;
+  $y = ($canvasSize[1] - $objectSize[1])*0.5;
+  return [$x,$y];
+}

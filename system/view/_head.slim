@@ -1,0 +1,18 @@
+---
+$path
+$title
+$shortcut-icon
+---
+
+meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible"
+meta charset="utf-8"
+meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"
+title {{$title}}
+link href="{{$shortcut-icon}}" rel="shortcut icon"
+
+= stylesheet_link_tag \
+  "//code.jquery.com/ui/1.7.2/themes/smoothness/jquery-ui.css", \
+  "/vender/bootstrap/css/bootstrap.min.css", \
+  "//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css", \
+  "{{$path}}vender/bootstrap-colorpickersliders/dist/bootstrap.colorpickersliders.min.css", \
+  "/stylesheets/all.css?2022071303"

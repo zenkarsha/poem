@@ -1,0 +1,67 @@
+<?php
+
+class commonModel extends Model
+{
+  //read
+  function select($table,$where=null,$order=null,$sort=null,$limit=null)
+  {
+    if($where!==null)
+    {
+      $where=explode('|',$where);
+      $whereScript=' WHERE `'.$where[0].'` = \''.$where[1].'\' ';
+    }
+    if($order!==null) $orderScript=' ORDER BY `'.$order.'` '.$sort.' ';
+    if($limit!==null)
+    {
+      $limit=explode('|',$limit);
+      $limitScript=' LIMIT '.$limit[0].','.$limit[1].' ';
+    }
+
+    $sql = "SELECT * FROM `$table`".$whereScript.$orderScript.$limitScript;
+    $this->fetch($sql);
+    return $this->packageData();
+  }
+
+  //insert
+  function insert($table,$columns,$values)
+  {
+    $sql = "INSERT INTO `".$table."` (".$columns.") VALUES (".$values.")";
+    $this->fetch($sql);
+  }
+
+  //delete
+  function delete($table,$id)
+  {
+    $sql = "DELETE FROM `$table` WHERE `id` = '$id'";
+    $this->fetch($sql);
+  }
+
+  //search
+  function search($table,$column,$keyword)
+  {
+    $sql = "SELECT * FROM `$table` WHERE `$column` LIKE '%$keyword%'";
+    $this->fetch($sql);
+    return $this->packageData();
+  }
+
+  //count
+  function count($table)
+  {
+    $sql = "SELECT count(*) as total FROM `$table`";
+    $res=mysql_query($sql);
+    $data=mysql_fetch_assoc($res);
+    return $data[total];
+  }
+
+  //update
+  function increase($table,$column,$id)
+  {
+    $sql = "UPDATE `$table` SET $column = $column + 1 WHERE `id` = $id";
+    $this->fetch($sql);
+  }
+  function update($table,$set,$where)
+  {
+    $sql = "UPDATE `$table` SET $set WHERE ".$where;
+    $this->fetch($sql);
+  }
+}

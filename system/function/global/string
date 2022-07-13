@@ -1,0 +1,33 @@
+<?php
+
+function randString($length = 10)
+{
+  $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for ($i = 0; $i < $length; $i++)
+    @$string .= $chars[rand(0, strlen($chars) - 1)];
+  return $string;
+}
+function clearString($string)
+{
+  $string = addslashes($string);
+  $string = htmlspecialchars($string);
+  $string = strip_tags($string);
+  $string = htmlentities($string);
+  return $string;
+}
+function htmlEncode($string)
+{
+  $string = addslashes($string);
+  $string = htmlspecialchars($string);
+  return $string;
+}
+function explodeByArray($delimiters,$string)
+{
+  $ready = str_replace($delimiters, $delimiters[0], $string);
+  $launch = explode($delimiters[0], $ready);
+  return $launch;
+}
+function mb_str_split($string)
+{
+  return preg_split('/(?<!^)(?!$)/u', $string);
+}

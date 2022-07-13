@@ -1,0 +1,48 @@
+<?php
+
+class showroomModel extends model
+{
+  function insertShowroomItem($url,$content,$ip,$device,$time)
+  {
+    $sql = ["INSERT INTO `showroom_detail` (`id`, `url`, `content`)
+              VALUES ('', '$url', '$content')",
+            "INSERT INTO `showroom_info` (`id`, `ip`, `device`, `time`)
+              VALUES ('', '$ip', '$device', '$time')",
+            "INSERT INTO `showroom_view` (`id`, `view`, `like`)
+              VALUES ('', 0, 0)"];
+    $this->fetch($sql,1);
+  }
+  function getShowroomList($limit='0,12',$sort='id')
+  {
+    $sql = "SELECT * FROM `showroom_detail`, `showroom_view` WHERE `showroom_detail`.id = `showroom_view`.id ORDER BY `showroom_view`.`$sort` DESC LIMIT $limit";
+    $this->fetch($sql);
+    return $this->packageData();
+  }
+  function getShowroomItem($url)
+  {
+    $sql = "SELECT * FROM `showroom_detail`, `showroom_view` WHERE `showroom_detail`.`id` = `showroom_view`.`id` AND `showroom_detail`.`url` = '$url'";
+    $this->fetch($sql);
+    return $this->getData();
+  }
+  function getShowroomItemLike($id)
+  {
+    $sql = "SELECT `like` FROM `showroom_view` WHERE `id` = '$id'";
+    $this->fetch($sql);
+    return $this->getData();
+  }
+  function updateShowroomItemView($id)
+  {
+    $sql = "UPDATE `showroom_view` SET view = view + 1 WHERE `id` = $id";
+    $this->fetch($sql);
+  }
+  function updateShowroomItemLike($id)
+  {
+    $sql = "UPDATE `showroom_view` SET `like` = `like` + 1 WHERE `id` = $id";
+    $this->fetch($sql);
+  }
+  function updateShowroomItemUnlike($id)
+  {
+    $sql = "UPDATE `showroom_view` SET `like` = `like` - 1 WHERE `id` = $id";
+    $this->fetch($sql);
+  }
+}

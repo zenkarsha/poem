@@ -1,0 +1,24 @@
+// gray
+$white            : #FFFFFE;
+$black            : #222221;
+
+// custom colors
+$kangxi-red       : #A30612;
+
+// main color
+$main-color       : $kangxi-red;
+$main-color-light : lighten($main-color, 10%);
+$main-color-dark  : darken($main-color, 10%);
+
+// background
+$background-color : #F0F1E3;
+
+// text
+$text-black       : #666;
+$text-black-light : #999;
+$text-gray        : #8A8A8A;
+$text-gray-light  : lighten($text-gray, 10%);
+
+// link
+$link-color       : $main-color;
+$link-color-hover : $main-color;

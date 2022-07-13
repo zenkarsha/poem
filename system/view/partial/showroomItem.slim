@@ -1,0 +1,12 @@
+---
+$path
+$url
+$image
+---
+
+.col-sm-6.col-md-4
+  a.thumbnail href="{{$path}}{{$url}}" target="_blank"
+    div style="background-image: url({{$image}});"
+    p.like
+      | {{$likebtn}}&nbsp;&nbsp;·&nbsp;&nbsp;
+      i.fa.fa-thumbs-o-up &nbsp;{{$likecount}} 個人說好詩

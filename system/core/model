@@ -1,0 +1,49 @@
+<?php
+
+class model
+{
+  var $db;
+  var $query;
+  function __construct()
+  {
+    $this->query = '';
+    $this->db = mysql_pconnect(DBHOST,DBUSER,DBPASS);
+    mysql_query("SET NAMES 'utf8'");
+    if(!mysql_select_db(DBNAME,$this->db))
+    {
+      //初始化資料庫
+      include './system/core/__install';
+      new install($this->db);
+    }
+  }
+  function fetch($sql,$multi=0)
+  {
+    if($multi == 1)
+      foreach ($sql as $query)
+        $this->query = mysql_unbuffered_query($query,$this->db);
+    else
+      $this->query = mysql_unbuffered_query($sql,$this->db);
+  }
+  function getRow()
+  {
+    if ($row = mysql_fetch_array($this->query,MYSQL_ASSOC)) return $row;
+    else return false;
+  }
+	function getData()
+	{
+		if ($data = $this->getRow()) return $data;
+		else return false;
+	}
+  function packageData()
+  {
+    $package = array();
+    while($data = $this->getRow()) {
+      array_push($package, $data);
+    }
+    return $package;
+  }
+  function checkTable($table)
+  {
+    return mysql_num_rows(mysql_query("SHOW TABLES LIKE '".$table."'"));
+  }
+}

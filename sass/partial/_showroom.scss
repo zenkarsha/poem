@@ -1,0 +1,72 @@
+.ajax-loading {
+  display: none;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+}
+.load-more {
+  text-align: center;
+  padding-top: 20px;
+}
+#showroom-list {
+  padding-top: 20px;
+  background: none;
+  .thumbnail {
+    padding: 0;
+    margin-bottom: 5px;
+    @include border-radius(0px);
+    border: none;
+    background: none;
+    div {
+      border: 1px solid $text-gray;
+      width: 100%;
+      padding-bottom: 100%;
+      background-repeat: no-repeat;
+      background-size: contain;
+      background-position: center;
+      background-color: #fff;
+      margin-bottom: 5px;
+    }
+  }
+  .like {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+}
+#showroom-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  .row,
+  .col-sm-12 {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+  }
+  .col-md-4 {
+    margin-bottom: 20px;
+  }
+  .well {
+    display: inline-block;
+    margin: auto;
+  }
+  .like {
+    margin-top: 20px;
+  }
+  .share-link {
+    margin-bottom: 20px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  @include at-breakpoint($pad-plus) {
+    .col-md-4 {
+      margin-bottom: 0;
+    }
+  }
+}
+.likebtn,
+.unlikebtn {
+  cursor: pointer;
+}

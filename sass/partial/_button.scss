@@ -1,0 +1,19 @@
+.btn {
+  @include border-radius(3px);
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.btn-default {
+  color: #fff;
+  background-color: $main-color;
+  border-color: $main-color-dark;
+
+  &:hover,
+  &:focus,
+  &:active,
+  &.active {
+    color: #fff;
+    background-color: $main-color-light;
+    border-color: $main-color;
+  }
+}
